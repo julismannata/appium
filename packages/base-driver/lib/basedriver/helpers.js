@@ -72,7 +72,7 @@ function verifyAppExtension(app, supportedAppExtensions) {
 }
 
 async function calculateFolderIntegrity(folderPath) {
-  return (await fs.glob('**/*', {cwd: folderPath, strict: false, nosort: true})).length;
+  return (await fs.glob('**/*', {cwd: folderPath, withFileTypes: false})).length;
 }
 
 async function calculateFileIntegrity(filePath) {
@@ -476,7 +476,7 @@ async function unzipApp(zipPath, dstRoot, supportedAppExtensions) {
     const sortedBundleItems = (
       await fs.glob(globPattern, {
         cwd: tmpRoot,
-        strict: false,
+        withFileTypes: false,
         // Get the top level match
       })
     ).sort((a, b) => a.split(path.sep).length - b.split(path.sep).length);

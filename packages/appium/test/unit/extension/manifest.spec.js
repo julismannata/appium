@@ -5,7 +5,6 @@ import {DRIVER_TYPE, PLUGIN_TYPE} from '../../../lib/constants';
 import {resolveFixture, rewiremock} from '../../helpers';
 import {initMocks} from './mocks';
 import {version as APPIUM_VER} from '../../../package.json';
-import EventEmitter from 'events';
 
 const {expect} = chai;
 
@@ -541,35 +540,16 @@ describe('Manifest', function () {
         expect(manifest.getExtensionData(DRIVER_TYPE)).to.have.property('myDriver');
       });
 
-      describe('when the underyling implementation emits "error"', function () {
+      describe('when the underyling implementation rejects', function () {
         beforeEach(function () {
-          // @ts-expect-error
-          MockGlob.callsFake(() => {
-            const ee = new EventEmitter();
-            setTimeout(() => {
-              ee.emit('error', new Error('bogus'));
-            });
-            return ee;
+          // @ts-expect-error I don't want to fake an entire asynciterator here ty
+          MockGlob.globIterate.callsFake(async function* () {
+            yield;
+            throw new Error('bogus');
           });
         });
         it('should reject', function () {
           expect(manifest.syncWithInstalledExtensions()).to.be.rejectedWith(Error, 'bogus');
-        });
-      });
-
-      describe('when the underlying implementation completes with an error', function () {
-        beforeEach(function () {
-          // @ts-expect-error
-          MockGlob.callsFake((spec, opts, done) => {
-            const ee = new EventEmitter();
-            setTimeout(() => {
-              done(new Error('wack'), []);
-            });
-            return ee;
-          });
-        });
-        it('should reject', function () {
-          expect(manifest.syncWithInstalledExtensions()).to.be.rejectedWith(Error, 'wack');
         });
       });
     });

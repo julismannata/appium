@@ -5,7 +5,6 @@
  * A collection of mocks reused across unit tests.
  */
 
-import {EventEmitter} from 'events';
 import path from 'path';
 import {createSandbox} from 'sinon';
 import {version as APPIUM_VER} from '../../../package.json';
@@ -110,18 +109,11 @@ export function initMocks(sandbox = createSandbox()) {
     sandbox.stub().callsFake((cwd, id) => path.join(cwd, id))
   );
 
-  const MockGlob = /** @type {MockGlob} */ (
-    sandbox.stub().callsFake((spec, opts, done) => {
-      const ee = new EventEmitter();
-      setTimeout(() => {
-        ee.emit('match', path.join(opts.cwd, 'package.json'));
-        setTimeout(() => {
-          done();
-        });
-      });
-      return ee;
-    })
-  );
+  const MockGlob = /** @type {MockGlob} */ ({
+    globIterate: sandbox.stub().callsFake(async function* (spec, opts) {
+      yield path.join(opts.cwd, 'package.json');
+    }),
+  });
 
   /** @type {Overrides} */
   const overrides = {
@@ -212,7 +204,7 @@ export function initMocks(sandbox = createSandbox()) {
 
 /**
  * Mock of package `glob`
- * @typedef {SinonStubbedMember<import('glob')>} MockGlob
+ * @typedef { { globIterate: SinonStubbedMember<import('glob').globIterate> } } MockGlob
  */
 
 /**

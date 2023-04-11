@@ -3,8 +3,8 @@
  */
 
 import B from 'bluebird';
-import glob from 'glob';
 import {env, fs} from '@appium/support';
+import {globIterate} from 'glob';
 import _ from 'lodash';
 import path from 'path';
 import YAML from 'yaml';
@@ -212,23 +212,13 @@ export class Manifest {
     ];
 
     // add dependencies to the queue
-    await new B((resolve, reject) => {
-      glob(
-        'node_modules/{*,@*/*}/package.json',
-        {cwd: this.#appiumHome, silent: true, absolute: true},
-        // eslint-disable-next-line promise/prefer-await-to-callbacks
-        (err) => {
-          if (err) {
-            reject(err);
-          }
-          resolve();
-        }
-      )
-        .on('error', reject)
-        .on('match', (filepath) => {
-          queue.push(onMatch(filepath));
-        });
-    });
+    for await (const filepath of globIterate('node_modules/{*,@*/*}/package.json', {
+      cwd: this.#appiumHome,
+      absolute: true,
+      withFileTypes: false,
+    })) {
+      queue.push(onMatch(filepath));
+    }
 
     // wait for everything to finish
     await B.all(queue);
