@@ -25,34 +25,35 @@ import {stringifyJson5, stringifyYaml} from './fs';
 /**
  * Data for the base `mkdocs.yml` file
  */
-const BASE_MKDOCS_YML: Readonly<MkDocsYml> = Object.freeze({
+const BASE_MKDOCS_YML = {
   INHERIT: './node_modules/@appium/docutils/base-mkdocs.yml',
   docs_dir: 'docs',
   site_dir: 'site',
-});
+} as const satisfies MkDocsYml;
 
 /**
  * Data for the base `typedoc.json` file
  */
-const BASE_TYPEDOC_JSON: Readonly<TypeDocJson> = Object.freeze({
+const BASE_TYPEDOC_JSON = {
   $schema: 'https://typedoc.org/schema.json',
   cleanOutputDir: true,
   entryPointStrategy: 'packages',
   theme: 'appium',
-  readme: 'none',
   entryPoints: ['.'],
-});
+  outputBuiltinCommands: false,
+  plugin: ['typedoc-plugin-markdown', '@appium/typedoc-plugin-appium'],
+} as const satisfies TypeDocJson;
 
 /**
  * Data for the base `tsconfig.json` file
  */
-const BASE_TSCONFIG_JSON: Readonly<TsConfigJson> = Object.freeze({
+const BASE_TSCONFIG_JSON = {
   $schema: 'https://json.schemastore.org/tsconfig',
   extends: '@appium/tsconfig/tsconfig.json',
   compilerOptions: {
     outDir: 'build',
   },
-});
+} as const satisfies TsConfigJson;
 
 const log = getLogger('init');
 const dryRunLog = getLogger('dry-run', log);
