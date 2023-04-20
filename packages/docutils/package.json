@@ -54,7 +54,7 @@
     "@appium/typedoc-plugin-appium": "^0.6.3",
     "@sliphua/lilconfig-ts-loader": "3.2.2",
     "chalk": "4.1.2",
-    "consola": "2.15.3",
+    "consola": "3.1.0",
     "diff": "5.1.0",
     "figures": "3.2.0",
     "find-up": "5.0.0",
